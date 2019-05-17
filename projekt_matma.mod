@@ -30,23 +30,23 @@ minimize fun: sum{dd in D, ee in E, mm in M} (K[ee]*x[dd,ee,mm]);
 
 /*ograniczenia*/
 s.t. sourceNodesHavePosDemand{dd in D, vv in V : vv == s[dd]}:
-        sum{ee in E}
+        sum{ee in E, mm in M}
         (A[ee,vv]*x[dd,ee,mm] - B[ee,vv]*x[dd,ee,mm]) = h[dd];
 
 s.t. transitNodesHaveZeroDemand{dd in D, vv in V : vv != s[dd] and vv != t[dd]}:
-        sum{ee in E}
+        sum{ee in E, mm in M}
         (A[ee,vv]*x[dd,ee,mm] - B[ee,vv]*x[dd,ee,mm]) = 0;
 
 s.t. destinationNodesHaveNegDemand{dd in D, vv in V : vv == t[dd]}:
-        sum{ee in E}
+        sum{ee in E, mm in M}
         (A[ee,vv]*x[dd,ee,mm] - B[ee,vv]*x[dd,ee,mm]) = -h[dd];
 
 s.t. C4{ee in E}:
-	sum{d in D} 
+	sum{dd in D} 
 	(h[dd]*z[ee,dd]) <= c[e];
 
 s.t. C5{dd in D, ee in E}:
-	sum{m in M}
+	sum{mm in M}
 	(x[dd,ee,mm]) <= 1;
 
 data;
