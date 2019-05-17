@@ -16,9 +16,9 @@ param h{D} >= 0;
 param K{E} >= 0;
 param s{D} in V, >= 0;
 param t{D} in V, >= 0;
-param c{E} >= 0;
-param A{E,V}, binary;
-param B{E,V}, binary;
+param c{E} >= 0, default 100;
+param A{E,V}, binary, default 0;
+param B{E,V}, binary, default 0;
 
 /*zmienne*/
 var x{D,E,M}, binary;
