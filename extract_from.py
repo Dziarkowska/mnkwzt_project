@@ -41,6 +41,33 @@ for i in range(uniq_len):
   AMatrix[unique[i][0]][unique[i][1]]=1
   AMatrix[unique[i][1]][unique[i][0]]=1
 
+#for i in range(nodes_number):
+#  print AMatrix[i]
+
+print ("data;\n## [number of nodes, arcs and demands]\nparam v := 10;\nparam e := 16;\nparam d := 2;\nparam m := 2;\n## [volume of demand, source node, destination node]\nparam : h  s t :=\n1       8 1 10\n2 \t8 2 8;")
+print "\nparam : A :="
 for i in range(nodes_number):
-  print AMatrix[i]
+  for j in range(nodes_number):
+    if AMatrix[i][j]==1 and i!=(nodes_number-1) and j!=(nodes_number-1):
+      print "{:5} {:3} {:4}".format(i+1, j+1, AMatrix[i][j])
+    elif i==(nodes_number-1) and j==(nodes_number-1):
+      print "{:5} {:3} {:4};".format(i+1, j+1, AMatrix[i][j])
+
+print "\nparam : B :="
+for i in range(nodes_number):
+  for j in range(nodes_number):
+    if AMatrix[i][j]==1 and i!=(nodes_number-1) and j!=(nodes_number-1):
+      print "{:5} {:3} {:4}".format(i+1, j+1, AMatrix[i][j])
+    elif i==(nodes_number-1) and j==(nodes_number-1):
+      print "{:5} {:3} {:4};".format(i+1, j+1, AMatrix[i][j])
+
+
+print "\nparam : K :="
+for i in range(nodes_number):
+  if i!=(nodes_number-1):
+    print "{:5} {:3}".format(i+1,15)
+  else:
+    print "{:5} {:3};".format(i+1,15)
+
+print "\nend;"
 
