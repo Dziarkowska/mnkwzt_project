@@ -31,6 +31,8 @@ def print2Smallest(arr):
     arr_size = len(arr) 
     first = second = sys.maxint 
     if arr_size >= 2: 
+        first_path=paths_list[0]['path']
+        second_path=paths_list[0]['path']
         for i in range(0, arr_size): 
     # If current element is smaller than first then 
     # update both first and second 
@@ -42,6 +44,9 @@ def print2Smallest(arr):
     # update second 
             elif (arr[i] < second and arr[i] != first): 
                 second = arr[i]
+                second_path=paths_list[i]['path']
+            elif (arr[i] < second and arr[i]==first):
+                second = first
                 second_path=paths_list[i]['path']
         print 'The lowest cost ({}) is the cost of path: {}'.format(first,first_path)
         print 'The second lowest cost({}) is the cost of path: {}\n'.format(second,second_path)     
