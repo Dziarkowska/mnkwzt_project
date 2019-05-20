@@ -25,6 +25,20 @@ def show_graph_with_labels(adjacency_matrix):
     nx.draw(G2, with_labels=True)
     plt.show()
 
+#WSTĘP DO SPRAWDZANIA ROZŁĄCZNOŚCI WIERZCHOŁKOWEJ
+def listsDiff(list1):
+    if len(list1)>1:
+        for l1 in list1:
+            for l2 in list1:
+                if l1 != l2:
+                    li1 = (l1['path'])
+                    li2 = (l2['path'])
+                    st = [l1['path'][0],l1['path'][-1]]
+                    diff = list((set(li1)&set(li2))-set(st))
+                    if len(diff)!=0:
+                        pass
+# TO BE CONTINUED -> jeśli dwie ścieżki zawierają taką samą krawędź, wybieramy tą o niższym koszcie, tą o wyższym odrzucamy
+
 #It choose the paths with the lowest cost
 def print2Smallest(arr): 
    
@@ -178,6 +192,7 @@ for i in range(1, graph.number_of_nodes()):
         if i!=j:
             print ("There can be maximum %d disjoint paths from %s to %s" %
                 (g.findDisjointPaths(i, j), i, j)) 
+            listsDiff(paths_list)
             print2Smallest(costs)
             del costs[0:len(costs)]
             del paths_list[0:len(paths_list)]
