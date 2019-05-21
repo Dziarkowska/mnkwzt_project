@@ -48,3 +48,5 @@ for i in range(edges_number):
 print "\nparam : B :="
 for i in range(edges_number):
     print "{:5} {:3}{:4}".format(i+1,sorted_edges_list[i][1],1)
+
+print "end;"
