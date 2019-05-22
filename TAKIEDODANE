@@ -1,0 +1,17 @@
+disjoint_paths=[]
+def listsDiff(list1):
+    if len(list1)>1:
+        for l1 in list1:
+            for l2 in list1:
+                if l1 != l2:
+                    li1 = (l1['path'])
+                    li2 = (l2['path'])
+                    st = [l1['path'][0],l1['path'][-1]]
+                    diff = list((set(li1)&set(li2))-set(st))
+                    if len(diff)!=0:
+                        if l1['cost']>l2['cost']:
+                            if l1 not in disjoint_paths:
+                                disjoint_paths.append(l1)
+                        else:
+                            if l2 not in disjoint_paths:
+                                disjoint_paths.append(l2)
