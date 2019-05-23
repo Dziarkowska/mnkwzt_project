@@ -1,0 +1,181 @@
+''' program ma na celu znalezienie rozlacznych sciezek pomiedzy wszystkimi mozliwymi kombinacjami zrodlo-ujscie z przekazanego pliku *.gml, 
+zawierajacego rzeczywista topologie polaczen wezlow w sieci, a nastepnie wybranie dwoch optymalnych pod wzgledem kosztow sciezek.
+Program oparty jest na zasadzie dzialania algorytm BFS, poszukujacego dostepnych sciezek, zaczynajac od "korzenia" i rozchodzac sie
+nastepnie po kolejnych, sasiadujacych wierzcholkach. '''
+
+import matplotlib.pyplot as plt
+import networkx as nx
+import numpy as np
+import argparse
+import math
+import sys
+import collections
+
+costs=[]
+paths_list=[]
+
+def parseMatrix(numpy_matrix, num_of_nodes):
+    matrix = numpy_matrix.astype(int)
+    output = matrix.tolist()
+    return output
+
+def show_graph_with_labels(adjacency_matrix):
+    fig=plt.figure()
+    G2 = nx.from_numpy_matrix(np.array(adjacency_matrix), create_using=nx.MultiDiGraph())
+    nx.draw(G2, with_labels=True)
+    plt.show()
+
+#Wybor sciezki o najnizszym koszcie
+def printSmallest(arr): 
+   
+    arr_size = len(arr) 
+    first = second = sys.maxint
+
+    if arr_size >= 2: 
+        first_path=paths_list[0]['path']
+        second_path=paths_list[0]['path']
+        for i in range(0, arr_size): 
+    # jesli element listy jest mniejszy od najmniejszego elementu "first", nastepuje zaktualizowanie wartosci second i first
+            if arr[i] < first: 
+                second = first
+                first = arr[i] 
+                first_path=paths_list[i]['path']
+    # jesli wartosc elementu listy jest mniejsza od drugiego najmniejszego elementu "second", nastepuje zaktualizowanie wartosci second
+            elif (arr[i] < second and arr[i] != first): 
+                second = arr[i]
+                second_path=paths_list[i]['path']
+            elif (arr[i]<second and arr[i]==first):
+                second = first
+                second_path=paths_list[i]['path']
+        print 'The lowest cost ({}) is the cost of path: {}'.format(first,first_path)
+        print 'The second lowest cost({}) is the cost of path: {}\n'.format(second,second_path)   
+
+
+#klasa reprezentujaca graf skierowany 
+class Graph: 
+
+    def __init__(self,graph): 
+        self.graph = graph 
+        self. ROW = len(graph) 
+        
+
+    # metoda zwraca "true", jesli istnieje sciezka pomiedzy punktem "s"(zrodlo) oraz "t"(ujscie), zapelniajac jednoczesnie tablice sciezka (zbior wierzcholkow)
+    def BFS(self,s, t, parent): 
+
+        # oznaczenie wszystkich wierzcholkow jako "nieodwiedzonych"=false  
+        visited =[False]*(self.ROW) 
+        
+        # Stworzenie listy=kolejki "queue" BFS 
+        queue=[] 
+        
+        # oznaczenie wierzcholka zrodlowego "s" jako "odwiedzonego"=true
+        queue.append(s) 
+        visited[s] = True
+        
+        # stworzenie standardowej petli dla algorytm BFS
+        while queue: 
+
+            #wyciagniecie z listy wierzcholka
+            u = queue.pop(0) 
+        
+            # Ustalenie wierzcholkow sasiadujacych z wierzcholkiem u, oznaczenie ich jako odwiedzonych oraz dodanie do kolejki
+            for ind, val in enumerate(self.graph[u]): 
+                if visited[ind] == False and val > 0 : 
+                    queue.append(ind) 
+                    visited[ind] = True
+                    parent[ind] = u
+                
+        # Jesli wierzcholek docelowy "t" zostal odwiedzony (visited[t]=True), metoda zwraca "true"  
+        return True if visited[t] else False
+
+    
+    
+    # Metoda zwraca wszystkie znalezione sciezki
+    def findDisjointPaths(self, source, sink): 
+
+        # tablica wypelniona przez metode BFS, przechowujaca sciezki 
+        parent = [-1]*(self.ROW) 
+
+        number_of_paths = 0 
+        max_flow=0
+
+        # Zwiekszenie max_flow, jesli istnieje sciezka
+        while self.BFS(source, sink, parent) : 
+
+            paths={}
+            path_flow = float("Inf")
+            s = sink
+            que = [s] 
+            while(s != source): 
+                path_flow = min (path_flow, self.graph[parent[s]][s]) 
+                s = parent[s] 
+                que.append(s)
+            
+            #stworzenie tablicy z odpowiednimi danymi na temat 
+            nodes = graph.nodes.data()
+            i=0
+            nodes_list=[]
+            for node in nodes:
+                nodes_info={}
+                nodes_info['id']=i
+                nodes_info['name']=node[0]
+                nodes_info['Latitude']=node[1]['Latitude']
+                nodes_info['Longitude']=node[1]['Longitude']
+                nodes_list.append(nodes_info)
+                i+=1
+
+            #obliczanie kosztu kazdego luku na podstawie odleglosci (wspolrzednych) pobranych z pliku *.gml
+            cost=0
+            for num1 in range(len(que)):
+                if num1!=len(que)-1:
+                    cost=cost+10*math.acos(math.sin(nodes_list[num1]['Latitude'])*math.sin(nodes_list[num1+1]['Latitude'])+math.cos(nodes_list[num1]['Latitude'])*math.cos(nodes_list[num1+1]['Latitude'])*math.cos(nodes_list[num1]['Longitude']-nodes_list[num1+1]['Longitude']))
+                    cost=int(cost)
+            paths['cost']=cost
+            paths['path']=que
+            paths_list.append(paths)
+            costs.append(cost)
+
+            #sumowanie przeplywu 
+            max_flow += path_flow 
+            number_of_paths+=1 
+            v = sink
+            
+            while(v != source): 
+                u = parent[v] 
+                self.graph[u][v] -= path_flow 
+                self.graph[v][u] += path_flow 
+                v = parent[v] 
+            
+        return number_of_paths 
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-f', '--file',
+    help='Path to .GML file')
+args = vars(parser.parse_args())
+
+graph = nx.read_gml(args['file'])
+nodes_num=graph.number_of_nodes()
+edges_num=graph.number_of_edges()
+#print edges_num
+
+
+
+adj_matrix = parseMatrix(nx.to_numpy_matrix(graph), graph.number_of_nodes())
+g = Graph(adj_matrix)
+temp_matrix_to_draw = adj_matrix
+
+
+print ("There are below disjoint paths in this topology: \n\n")
+
+for i in range(1, graph.number_of_nodes()):
+    for j in range(1, graph.number_of_nodes()):
+        if i!=j:
+            g.findDisjointPaths(i, j)
+            printSmallest(costs)
+            del costs[0:len(costs)]
+            del paths_list[0:len(paths_list)]
+
+
+show_graph_with_labels(adj_matrix)
+
+input('Press Enter to exit')
