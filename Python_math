@@ -10,6 +10,9 @@ import argparse
 import math
 import sys
 import collections
+from timeit import default_timer as timer
+
+start = timer()
 
 costs=[]
 paths_list=[]
@@ -175,6 +178,9 @@ for i in range(1, graph.number_of_nodes()):
             del costs[0:len(costs)]
             del paths_list[0:len(paths_list)]
 
+end=timer()
+fast=end-start
+print "Program found disjoint paths in: {} seconds.".format(fast)
 
 show_graph_with_labels(adj_matrix)
 
